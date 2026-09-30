@@ -1,0 +1,48 @@
+# Example config used by the README demo and by src tests that load a real config file.
+# See docs/WRITING_SCENARIOS.md for the full field reference.
+
+contracts:
+  - name: hello-world
+    wasm: ./examples/wasm/hello-world.wasm
+  - name: counter
+    wasm: ./examples/wasm/counter.wasm
+  - name: heavy-loop
+    wasm: ./examples/wasm/heavy-loop.wasm
+  - name: auth
+    wasm: ./examples/wasm/auth.wasm
+
+accounts:
+  - default
+
+thresholds:
+  costPercent: 5
+
+scenarios:
+  - name: say-hello
+    contract: hello-world
+    function: hello
+    args:
+      - type: string
+        value: preflight
+
+  - name: increment-counter
+    contract: counter
+    function: increment
+    submit: true
+
+  - name: read-counter
+    contract: counter
+    function: get
+
+  - name: sum-to-1000
+    contract: heavy-loop
+    function: sum_to
+    args:
+      - type: u32
+        value: 1000
+
+  - name: restricted-call
+    contract: auth
+    function: restricted
+    args:
+      - type: source-account

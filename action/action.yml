@@ -1,0 +1,46 @@
+name: 'Upgrade Preflight'
+description: 'Diffs Soroban contract behavior across two Stellar protocol versions on a local network.'
+inputs:
+  from:
+    description: 'Baseline protocol version'
+    required: true
+  to:
+    description: 'Target protocol version'
+    required: true
+  config:
+    description: 'Path to preflight.config.yml'
+    required: false
+    default: 'preflight.config.yml'
+  node-version:
+    description: 'Node.js version to run the CLI with'
+    required: false
+    default: '22'
+runs:
+  using: 'composite'
+  steps:
+    - uses: actions/setup-node@v4
+      with:
+        node-version: ${{ inputs.node-version }}
+    - name: Build upgrade-preflight
+      shell: bash
+      # github.action_path points at THIS repo's checkout (the action's own repo, auto-fetched
+      # by the runner) — /action is one level below the repo root.
+      working-directory: ${{ github.action_path }}/..
+      run: |
+        npm ci
+        npm run build
+    - name: Run upgrade-preflight
+      shell: bash
+      working-directory: ${{ github.workspace }}
+      run: |
+        REPORT_PATH="$RUNNER_TEMP/upgrade-preflight-report.md"
+        node "${{ github.action_path }}/../dist/cli/index.js" run \
+          --from "${{ inputs.from }}" \
+          --to "${{ inputs.to }}" \
+          --config "${{ inputs.config }}" \
+          --markdown-out "$REPORT_PATH"
+        EXIT_CODE=$?
+        if [ -f "$REPORT_PATH" ]; then
+          cat "$REPORT_PATH" >> "$GITHUB_STEP_SUMMARY"
+        fi
+        exit $EXIT_CODE

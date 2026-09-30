@@ -1,0 +1,42 @@
+{
+  "name": "upgrade-preflight",
+  "version": "0.1.0",
+  "private": false,
+  "description": "CLI + GitHub Action that diffs Soroban contract behavior across two Stellar protocol versions on local networks.",
+  "type": "module",
+  "license": "MIT",
+  "bin": {
+    "upgrade-preflight": "./dist/cli/index.js"
+  },
+  "files": [
+    "dist",
+    "action",
+    "examples"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "dev": "tsx src/cli/index.ts",
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:integration": "vitest run --config vitest.integration.config.mts"
+  },
+  "dependencies": {
+    "@stellar/stellar-sdk": "^17.2.0",
+    "commander": "^15.0.0",
+    "yaml": "^2.9.1",
+    "zod": "^4.6.5"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@types/node": "^26.6.3",
+    "eslint": "^10.11.0",
+    "tsx": "^4.23.15",
+    "typescript": "^6.0.3",
+    "typescript-eslint": "^8.71.0",
+    "vitest": "^5.0.2"
+  },
+  "engines": {
+    "node": ">=20.11"
+  }
+}
