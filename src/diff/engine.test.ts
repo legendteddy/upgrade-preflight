@@ -117,6 +117,16 @@ describe('diffScenario', () => {
     expect(result.verdict).toBe('COSTS_CHANGED');
   });
 
+  it('compares bigint return values without throwing (scValToNative decodes u64/i128 as bigint)', () => {
+    const result = diffScenario(ok({ returnValue: 5050n }), ok({ returnValue: 5050n }), 5);
+    expect(result.verdict).toBe('SAME');
+  });
+
+  it('detects a real change between two different bigint return values', () => {
+    const result = diffScenario(ok({ returnValue: 5050n }), ok({ returnValue: 5051n }), 5);
+    expect(result.verdict).toBe('BEHAVIOR_CHANGED');
+  });
+
   it('throws if baseline and target scenario names do not match', () => {
     expect(() => diffScenario(ok({ scenario: 'a' }), ok({ scenario: 'b' }), 5)).toThrow();
   });

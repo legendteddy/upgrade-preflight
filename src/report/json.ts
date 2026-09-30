@@ -20,6 +20,12 @@ export function toJsonReport(diff: RunDiff): JsonReport {
   };
 }
 
+/** A `ScenarioResult.returnValue` can be a native `bigint` (scValToNative decodes Soroban's
+ * u64/i64/u128/i128 types that way), which plain `JSON.stringify` throws on outright. */
 export function toJson(diff: RunDiff): string {
-  return JSON.stringify(toJsonReport(diff), null, 2);
+  return JSON.stringify(
+    toJsonReport(diff),
+    (_key, value) => (typeof value === 'bigint' ? `${value.toString()}n` : value),
+    2
+  );
 }

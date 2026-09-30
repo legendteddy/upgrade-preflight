@@ -1,14 +1,14 @@
 import { describe, expect, it } from 'vitest';
 import { diffRun } from '../diff/engine.js';
 import type { ScenarioResult } from '../diff/types.js';
-import { toJsonReport } from './json.js';
+import { toJson, toJsonReport } from './json.js';
 
-function ok(name: string): ScenarioResult {
+function ok(name: string, returnValue: unknown = 1): ScenarioResult {
   return {
     scenario: name,
     status: 'ok',
     success: true,
-    returnValue: 1,
+    returnValue,
     contractError: null,
     events: [],
     resources: null,
@@ -30,5 +30,11 @@ describe('toJsonReport', () => {
     const run = diffRun(27, 28, [ok('a'), ok('b')], [ok('a'), ok('b')], () => 5);
     const report = toJsonReport(run);
     expect(report.coverageNote).toContain('2 scenario');
+  });
+
+  it('serializes a bigint return value without throwing (scValToNative decodes u64/i128 as bigint)', () => {
+    const run = diffRun(27, 28, [ok('a', 5050n)], [ok('a', 5050n)], () => 5);
+    expect(() => toJson(run)).not.toThrow();
+    expect(toJson(run)).toContain('5050n');
   });
 });

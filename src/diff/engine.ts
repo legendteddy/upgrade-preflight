@@ -225,8 +225,15 @@ function normalizeError(error: string | null): string {
   return (error ?? '').trim().toLowerCase();
 }
 
+/** `scValToNative` decodes Soroban's 64/128-bit integer types (u64/i64/u128/i128) to native
+ * `bigint`, which `JSON.stringify` cannot serialize at all — it throws, rather than dropping or
+ * coercing it. This replacer tags bigints as strings so equality comparison still works. */
+function stringifyForCompare(value: unknown): string {
+  return JSON.stringify(value, (_key, v) => (typeof v === 'bigint' ? `${v.toString()}n` : v));
+}
+
 function deepEqualJson(a: unknown, b: unknown): boolean {
-  return JSON.stringify(a) === JSON.stringify(b);
+  return stringifyForCompare(a) === stringifyForCompare(b);
 }
 
 function arraysEqual(a: string[], b: string[]): boolean {
