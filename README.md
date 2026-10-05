@@ -36,30 +36,17 @@ node dist/cli/index.js run --from 27 --to 28
 This runs the bundled `preflight.config.yml` and its four example contracts (see
 [`examples/`](examples/)) against protocol 27 and 28.
 
-## Example output
+## What has and hasn't been verified
 
-The command above prints a Markdown report like this. Protocol 28 introduced Soroban host
-changes (CAP-85); this specific sample was NOT captured from a real run in this environment
-(Docker isn't available here — see `PLAN.md`), so it's illustrative, not a real result:
-
-```markdown
-# Upgrade Preflight: protocol 27 → 28
-
-**Overall verdict: ⚠️ COSTS_CHANGED**
-
-| Scenario | Verdict | Baseline | Target | Notes |
-| --- | --- | --- | --- | --- |
-| say-hello | ✅ SAME | ok | ok | Same behavior and resource usage within threshold. |
-| increment-counter | ✅ SAME | ok | ok | Same behavior and resource usage within threshold. |
-| read-counter | ✅ SAME | ok | ok | Same behavior and resource usage within threshold. |
-| sum-to-1000 | ⚠️ COSTS_CHANGED | ok | ok | Same behavior, but resource usage changed beyond the 5% threshold: instructions +7.2% (100000 -> 107200). |
-| restricted-call | ✅ SAME | ok | ok | Same behavior and resource usage within threshold. |
-```
-
-A protocol 28 vs 29 run is expected to report `SAME`, since the real Protocol 29 release
-(see `stellarbrief/advisory-brief`'s own fixture) is a security fix with no other relevant
-changes — that's a valid, useful result worth having the tool confirm, not a sign it isn't
-doing anything.
+- The diff engine (verdict rules, thresholds, bigint-safe comparison) is unit-tested.
+- The automated CI integration test boots **one** `stellar/quickstart` network at protocol 27,
+  deploys the example contracts, runs every scenario, and checks resource data comes back. It
+  does not compare two protocol versions.
+- The full two-network comparison (`run --from X --to Y`) is exercised by the manual
+  **Real cross-version diff** workflow (`.github/workflows/real-diff.yml`), which uploads the
+  Markdown and JSON reports as artifacts. Until a report from that workflow is linked here, treat
+  the cross-version output as unverified; no sample report is shown because none has been
+  captured from a real run yet.
 
 ## How verdicts work, and their limits
 
@@ -81,11 +68,9 @@ See [`docs/CI_USAGE.md`](docs/CI_USAGE.md) for the GitHub Action and exit codes.
 See [`ISSUES_BACKLOG.md`](ISSUES_BACKLOG.md) for ~20 scoped, ready-to-pick-up issues, and
 [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) for the fuller design writeup.
 
-## Contributing via Stellar Wave
+## Contributing
 
-This repo is applying to the [Stellar Wave Program](https://docs.drips.network/wave/), where
-maintainers list scoped issues and outside contributors solve them for points. See
-[`CONTRIBUTING.md`](CONTRIBUTING.md) for setup, the PR flow, and how issues are rated.
+See [`CONTRIBUTING.md`](CONTRIBUTING.md) for setup, the PR flow, and how issues are rated.
 
 ## License
 

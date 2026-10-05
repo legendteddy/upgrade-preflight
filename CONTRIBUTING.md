@@ -58,8 +58,3 @@ tiers:
   type, CI improvements.
 - **High**: a complex feature, refactor, or new integration — a new network backend, a plugin
   system, protocol-matrix (N-version) runs.
-
-## Contributing via Stellar Wave
-
-This repo is applying to the [Stellar Wave Program](https://docs.drips.network/wave/), where
-maintainers list scoped issues and outside contributors solve them for points.

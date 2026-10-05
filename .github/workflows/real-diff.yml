@@ -1,0 +1,58 @@
+name: Real cross-version diff
+
+# Runs the actual CLI end to end: two real stellar/quickstart networks on different protocol
+# versions, the same scenarios against both, and a diff. The main CI's integration job only boots
+# one network, so this is the only place the two-network path is exercised for real. Manual-only
+# because it takes several minutes; trigger from the Actions tab or `gh workflow run`.
+on:
+  workflow_dispatch:
+    inputs:
+      from:
+        description: Baseline protocol version
+        default: '27'
+      to:
+        description: Target protocol version
+        default: '28'
+
+jobs:
+  diff:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+      - run: docker pull stellar/quickstart:latest
+      - name: Run ${{ inputs.from }} -> ${{ inputs.to }}
+        # Exit 1 (BEHAVIOR_CHANGED/BROKE) is a real result worth reporting, not a tool failure.
+        # Only 2 (ERROR: a network never came up, a result went missing) or higher fails the job.
+        run: |
+          set +e
+          node dist/cli/index.js run --from "${{ inputs.from }}" --to "${{ inputs.to }}" \
+            --markdown-out report.md --json-out report.json
+          code=$?
+          echo "CLI exited with code $code"
+          if [ "$code" -ge 2 ]; then
+            echo "::error::Exit code $code means the tool itself failed, not that the contracts changed."
+            exit "$code"
+          fi
+          exit 0
+      - name: Write report to job summary
+        if: always()
+        run: |
+          if [ -f report.md ]; then
+            cat report.md >> "$GITHUB_STEP_SUMMARY"
+          fi
+      - name: Upload report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: preflight-${{ inputs.from }}-to-${{ inputs.to }}
+          path: |
+            report.md
+            report.json
+          retention-days: 30
