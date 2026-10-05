@@ -7,6 +7,13 @@ import { startQuickstart } from '../network/quickstart.js';
 import { createFundedAccount, type FundedAccount } from '../sdk/accounts.js';
 import { toScVal } from '../sdk/args.js';
 import { deployContract, submitAndWait } from '../sdk/deploy.js';
+import {
+  buildSubstitutions,
+  normalizeEventXdr,
+  normalizeText,
+  normalizeValue,
+  type Substitution,
+} from '../sdk/normalize.js';
 import { simulate } from '../sdk/simulate.js';
 
 export interface RunOptions {
@@ -47,10 +54,15 @@ export async function runAgainstProtocol(
       contracts.set(contractEntry.name, contractId);
     }
 
+    const subs = buildSubstitutions(
+      contracts,
+      new Map([...accounts].map(([name, account]) => [name, account.publicKey]))
+    );
+
     const results: ScenarioResult[] = [];
     for (const scenario of config.scenarios) {
       results.push(
-        await runScenario(server, network.networkPassphrase, scenario, accounts, contracts)
+        await runScenario(server, network.networkPassphrase, scenario, accounts, contracts, subs)
       );
     }
     return results;
@@ -70,7 +82,8 @@ async function runScenario(
   networkPassphrase: string,
   scenario: ScenarioEntry,
   accounts: Map<string, FundedAccount>,
-  contracts: Map<string, string>
+  contracts: Map<string, string>,
+  subs: Substitution[]
 ): Promise<ScenarioResult> {
   try {
     const account = accounts.get(scenario.sourceAccount);
@@ -91,9 +104,10 @@ async function runScenario(
       scenario: scenario.name,
       status: 'ok',
       success: outcome.success,
-      returnValue: outcome.returnValue,
-      contractError: outcome.contractError,
-      events: outcome.events,
+      returnValue: normalizeValue(outcome.returnValue, subs),
+      contractError:
+        outcome.contractError === null ? null : normalizeText(outcome.contractError, subs),
+      events: outcome.events.map((event) => normalizeEventXdr(event, subs)),
       resources: outcome.resources,
       minResourceFee: outcome.minResourceFee,
     };

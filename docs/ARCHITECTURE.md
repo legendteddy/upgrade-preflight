@@ -16,6 +16,13 @@ captured results. Nothing is simulated or guessed: both runs execute real transa
 `simulateTransaction`, and real submission for scenarios marked `submit: true`) against a real
 `stellar-core` + `stellar-rpc` stack.
 
+**Identity normalization.** Each network deploys with freshly generated accounts, so the same
+contract gets a different contract ID on each network, and those IDs are embedded in raw event
+XDR, return values and error text. Comparing them raw reported every scenario as changed. Before
+diffing, `src/sdk/normalize.ts` replaces each network's own contract and account identities with
+placeholders derived from the scenario-level name, so only real differences remain. This was
+found by the first real 27 to 28 run (`src/sdk/normalize.test.ts` uses the captured events).
+
 ## Module map
 
 ```
