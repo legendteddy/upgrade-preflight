@@ -44,9 +44,35 @@ This runs the bundled `preflight.config.yml` and its four example contracts (see
   does not compare two protocol versions.
 - The full two-network comparison (`run --from X --to Y`) is exercised by the manual
   **Real cross-version diff** workflow (`.github/workflows/real-diff.yml`), which uploads the
-  Markdown and JSON reports as artifacts. Until a report from that workflow is linked here, treat
-  the cross-version output as unverified; no sample report is shown because none has been
-  captured from a real run yet.
+  Markdown and JSON reports as artifacts. Before each report the tool checks that the RPC's
+  `getNetwork().protocolVersion` (documented as the protocol of the latest ledger) matches the
+  requested protocol, and fails if it doesn't.
+
+### A real captured result: protocol 27 → 28
+
+From the workflow's runs on the bundled `preflight.config.yml` and its four example contracts.
+Two independent runs produced identical numbers.
+
+| Scenario | Verdict | Instructions (27 → 28) |
+| --- | --- | --- |
+| say-hello | COSTS_CHANGED | 360010 → 336076 (-6.6%) |
+| increment-counter | COSTS_CHANGED | 368190 → 338842 (-8.0%) |
+| read-counter | COSTS_CHANGED | 362598 → 331274 (-8.6%) |
+| sum-to-1000 | COSTS_CHANGED | 342106 → 311611 (-8.9%) |
+| restricted-call | COSTS_CHANGED | 344204 → 324317 (-5.8%) |
+
+Return values, emitted events, disk reads, writes and footprint entries were identical across
+both protocols; the minimum resource fee moved by 0.1% to 0.2%.
+
+What this does and doesn't show:
+
+- These are tiny example contracts, and the figures are `simulateTransaction` estimates from the
+  RPC, not on-ledger metered costs. Don't extrapolate them to real contracts.
+- The drop is roughly constant across very different scenarios, which suggests a change in
+  fixed per-call overhead rather than in contract logic. That is an interpretation; this project
+  has not traced it to a specific protocol change.
+- The automated CI integration test still boots a single network. The two-network path runs only
+  in the manual workflow above.
 
 ## How verdicts work, and their limits
 
