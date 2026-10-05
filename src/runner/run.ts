@@ -3,6 +3,7 @@ import { BASE_FEE, Operation, TransactionBuilder, rpc } from '@stellar/stellar-s
 import type { Keypair } from '@stellar/stellar-sdk';
 import type { PreflightConfig, ScenarioEntry } from '../config/schema.js';
 import type { ScenarioResult } from '../diff/types.js';
+import { waitForLedgerProtocol } from '../network/protocol-check.js';
 import { startQuickstart } from '../network/quickstart.js';
 import { createFundedAccount, type FundedAccount } from '../sdk/accounts.js';
 import { toScVal } from '../sdk/args.js';
@@ -37,6 +38,11 @@ export async function runAgainstProtocol(
 
   try {
     const server = new rpc.Server(network.rpcUrl, { allowHttp: true });
+
+    await waitForLedgerProtocol(
+      async () => (await server.getNetwork()).protocolVersion,
+      opts.protocolVersion
+    );
 
     const accounts = new Map<string, FundedAccount>();
     for (const name of config.accounts) {

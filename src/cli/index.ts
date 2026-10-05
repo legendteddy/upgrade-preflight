@@ -4,6 +4,7 @@ import { Command } from 'commander';
 import { loadConfig, ConfigError } from '../config/loader.js';
 import { diffRun } from '../diff/engine.js';
 import type { ScenarioEntry } from '../config/schema.js';
+import type { ScenarioResult } from '../diff/types.js';
 import { toMarkdown } from '../report/markdown.js';
 import { toJson } from '../report/json.js';
 import { runAgainstProtocol } from '../runner/run.js';
@@ -43,21 +44,31 @@ program
       return entry?.thresholds?.costPercent ?? config.thresholds.costPercent;
     };
 
-    console.error(`Starting baseline network (protocol ${options.from})...`);
-    const baselineResults = await runAgainstProtocol(config, {
-      hostPort: 8000,
-      containerName: `upgrade-preflight-${options.from}`,
-      protocolVersion: options.from,
-      configDir,
-    });
+    let baselineResults: ScenarioResult[];
+    let targetResults: ScenarioResult[];
+    try {
+      console.error(`Starting baseline network (protocol ${options.from})...`);
+      baselineResults = await runAgainstProtocol(config, {
+        hostPort: 8000,
+        containerName: `upgrade-preflight-${options.from}`,
+        protocolVersion: options.from,
+        configDir,
+      });
 
-    console.error(`Starting target network (protocol ${options.to})...`);
-    const targetResults = await runAgainstProtocol(config, {
-      hostPort: 8001,
-      containerName: `upgrade-preflight-${options.to}`,
-      protocolVersion: options.to,
-      configDir,
-    });
+      console.error(`Starting target network (protocol ${options.to})...`);
+      targetResults = await runAgainstProtocol(config, {
+        hostPort: 8001,
+        containerName: `upgrade-preflight-${options.to}`,
+        protocolVersion: options.to,
+        configDir,
+      });
+    } catch (err) {
+      // A network that never came up, or one not running the requested protocol, is a tool
+      // failure (exit 2, as documented in docs/CI_USAGE.md), not a verdict about the contracts.
+      console.error(`upgrade-preflight failed: ${(err as Error).message}`);
+      process.exitCode = 2;
+      return;
+    }
 
     const diff = diffRun(options.from, options.to, baselineResults, targetResults, costThresholdFor);
 
