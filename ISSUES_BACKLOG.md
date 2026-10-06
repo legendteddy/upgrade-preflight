@@ -1,161 +1,275 @@
 # Issues backlog
 
-20 scoped issues, ready to post to GitHub. Complexity ratings follow the
-[Stellar Wave Program](https://docs.drips.network/wave/)'s three tiers.
+Candidate issues, each written to be posted to GitHub as-is. Every entry states the current
+state at a specific commit, what to build, how to verify it, and what is out of scope.
+Complexity (Trivial / Medium / High) follows the tiers in [`CONTRIBUTING.md`](CONTRIBUTING.md).
+If you pick one up, comment on the issue first so two people don't build the same thing.
 
-## Trivial (8)
+Audited commit: `3235411`
 
-### 1. Add a `--quiet` flag to suppress the per-network startup log lines
-The CLI logs "Starting baseline network..." etc. to stderr unconditionally. Add a `--quiet`
-flag to `upgrade-preflight run` that suppresses these, for cleaner CI logs when the Markdown
-report is the only wanted output.
-- [ ] `--quiet` suppresses the two `console.error` startup lines in `src/cli/index.ts`
-- [ ] Markdown/JSON output is unaffected
-- Suggested files: `src/cli/index.ts`
+---
 
-### 2. Publish a JSON Schema for `preflight.config.yml`
-Generate a JSON Schema from `PreflightConfigSchema` (zod has `z.toJSONSchema()`) and commit it,
-so editors can offer autocomplete/validation on the YAML config.
-- [ ] `schema/preflight.config.schema.json` is generated and committed
-- [ ] A script or npm command regenerates it
-- Suggested files: `src/config/schema.ts`, new `scripts/generate-schema.ts`
+### 1. Run a real two-protocol comparison in the CI integration job
+**Complexity:** Medium
 
-### 3. Add a README badge row (CI status, license, npm if published)
-- [ ] Badges render correctly on GitHub
-- Suggested files: `README.md`
+**Description**
+The tool's central behavior (same scenarios on two protocol versions, then a diff) is only
+exercised by hand. A regression in the two-network path would not fail CI.
 
-### 4. Improve the "no target result" error message in `diffRun`
-Currently a generic "No target-run result was captured..." — include the full list of scenario
-names that WERE found in the target run, to make debugging a typo'd scenario name faster.
-- [ ] Error message lists available scenario names
-- [ ] Existing test in `src/diff/engine.test.ts` still passes; add one for the new message content
-- Suggested files: `src/diff/engine.ts`
+**Current state**
+`src/runner/run.integration.test.ts` boots one network at protocol 27 and diffs the result
+against itself with `diffRun(27, 27, results, results, ...)`, which always returns `SAME`. The
+two-network path in `src/cli/index.ts` runs only through the manual workflow
+`.github/workflows/real-diff.yml`. That workflow found a real bug (per-network contract IDs made
+every scenario look changed, fixed in `src/sdk/normalize.ts`) which no test had caught.
 
-### 5. Add a `hello-world` variant scenario with a non-ASCII string argument
-Exercises the `string` arg type's UTF-8 handling explicitly.
-- [ ] New scenario added to `preflight.config.yml` and covered by a unit test on `src/sdk/args.ts`
-- Suggested files: `preflight.config.yml`, `src/sdk/args.test.ts`
+**What to build**
+An integration test that calls `runAgainstProtocol` for protocol 27 and 28 on different host
+ports and diffs them with `diffRun`. It should assert that every scenario has `status: 'ok'` on
+both sides, that no scenario has verdict `ERROR`, and that the read-only scenarios have equal
+events after normalization. State the CI time added (roughly four extra minutes) and decide
+whether it runs on every push or on a schedule.
 
-### 6. Document the exit codes in `--help` output
-`upgrade-preflight run --help` should mention exit codes 0/1/2 inline, not just in
-`docs/CI_USAGE.md`.
-- [ ] `commander`'s `.addHelpText('after', ...)` used to append the exit code table
-- Suggested files: `src/cli/index.ts`
+**Acceptance criteria**
+- [ ] The test fails if the identity normalization in `src/runner/run.ts` is removed.
+- [ ] It skips cleanly, with a logged reason, when Docker is unavailable (same as the existing test).
+- [ ] The PR states the CI time impact and the chosen trigger.
 
-### 7. Add a CONTRIBUTING.md note on WSL/Docker Desktop quirks
-Docker Desktop on Windows via WSL2 has known port-binding gotchas; document the one workaround
-maintainers actually needed (if any) building this repo.
-- [ ] A short "Known environment quirks" section added
-- Suggested files: `CONTRIBUTING.md`
+**Out of scope**
+Asserting specific instruction counts. Changing the diff engine or thresholds.
 
-### 8. Rename `contractError` to `errorMessage` for clarity — or document why not
-`ScenarioDiff.baseline.contractError`/`.target.contractError` reads oddly for a genuine
-tool-level `ERROR` scenario (where it's always `null`). Either rename for clarity or add a
-one-line doc comment on `ScenarioResult` explaining the distinction from `toolError`.
-- [ ] Either the rename lands (with all call sites and tests updated) or a doc comment is added
-- Suggested files: `src/diff/types.ts`
+**Verification**
+`npm run test:integration` with Docker running.
 
-## Medium (8)
+---
 
-### 9. Add an HTML report renderer
-A `toHtml(diff: RunDiff): string` alongside `toMarkdown`/`toJson`, styled minimally, for
-attaching to CI artifacts or publishing as a GitHub Pages report.
-- [ ] `src/report/html.ts` with the same coverage-disclaimer guarantee as `toMarkdown`
-- [ ] Unit tests mirroring `src/report/markdown.test.ts`
-- [ ] `--html-out` flag wired up in the CLI
-- Suggested files: `src/report/html.ts`, `src/cli/index.ts`
+### 2. Explain the instruction-count drop from protocol 27 to 28
+**Complexity:** Medium (investigation)
 
-### 10. Support running scenarios concurrently within one network
-`runAgainstProtocol` currently executes scenarios sequentially. For configs with many
-independent (non-state-mutating) scenarios, running them concurrently against the same network
-would speed up CI significantly.
-- [ ] A `--concurrency <n>` flag (default 1, preserving today's behavior)
-- [ ] Scenarios with `submit: true` against the same contract are still serialized relative to
-  each other, to avoid sequence-number races
-- Suggested files: `src/runner/run.ts`, `src/cli/index.ts`
+**Description**
+The first real 27 to 28 run showed instructions down 5.8% to 8.9% in every scenario. The
+absolute drop is nearly constant (about 20k to 31k) even for very different scenarios, which
+suggests a fixed per-call cost changed. That is a guess. Nobody has measured it.
 
-### 11. Make the network backend pluggable via config
-Currently `src/runner/run.ts` hardcodes `startQuickstart`. Add a `network.backend` config field
-(default `quickstart`) and a small registry, per `docs/ADDING_A_NETWORK_BACKEND.md`.
-- [ ] `PreflightConfigSchema` gains an optional `network.backend` field
-- [ ] At least the existing quickstart backend is selectable by name
-- [ ] `docs/ADDING_A_NETWORK_BACKEND.md` updated to reflect the registry
-- Suggested files: `src/config/schema.ts`, `src/runner/run.ts`, `src/network/`
+**Current state**
+The README's "A real captured result" section has the numbers (for example `sum-to-1000`:
+342106 to 311611). `examples/contracts/heavy-loop` exposes `sum_to(n)`, so cost can be varied
+with the amount of work.
 
-### 12. Verify `examples/wasm/CHECKSUMS.txt` in CI
-Add a CI step that recomputes SHA-256 over `examples/wasm/*.wasm` and fails if it doesn't match
-`CHECKSUMS.txt`, catching a stale checked-in wasm after a contract source change.
-- [ ] New CI step (or script invoked by one) in `.github/workflows/ci.yml`
-- [ ] Fails with a clear message naming the mismatched file
-- Suggested files: `.github/workflows/ci.yml`, new `scripts/verify-checksums.sh`
+**What to build**
+Run `sum_to` with several values of n (for example 0, 1000, 10000, 100000) on protocols 27 and
+28 using a scratch config, and separate the fixed cost from the per-iteration cost on each
+protocol. Write the result to `docs/FINDINGS_27_TO_28.md` with the raw JSON reports linked or
+committed. Trace the cause to a protocol change only if you can cite a source; otherwise say it
+is unknown.
 
-### 13. Add a `Testnet` read-only mode (no local Docker network)
-For a quick sanity check without spinning up Docker: run all scenarios as read-only
-simulations against public Testnet RPC on both "before" and "after" by pinning to specific
-ledger sequences, where possible — otherwise document why this can't fully substitute for the
-local-network mode.
-- [ ] A `--testnet-readonly` flag or separate command
-- [ ] Clearly documented limits vs. the local-network mode
-- Suggested files: `src/cli/index.ts`, `docs/CI_USAGE.md`
+**Acceptance criteria**
+- [ ] A table of n against instructions for both protocols, from real runs.
+- [ ] A clear statement of what the data does and does not establish.
+- [ ] No change is attributed to a specific CAP without a link to its text.
 
-### 14. Add per-scenario timeout handling
-A hung RPC call currently has no scenario-level timeout — only the underlying HTTP client's
-default. Add an explicit, configurable per-scenario timeout that surfaces as a clean `ERROR`
-verdict rather than hanging the whole run.
-- [ ] `preflight.config.yml` gains an optional `scenario.timeoutMs`
-- [ ] A timed-out scenario reports `status: 'error'` with a clear message, not a crash
-- Suggested files: `src/config/schema.ts`, `src/runner/run.ts`
+**Out of scope**
+Changing thresholds, the diff engine, or the example contracts.
 
-### 15. Cache the Docker image pull between the two protocol runs
-Right now each `startQuickstart` call implicitly pulls (or reuses, if Docker already has it)
-the same `stellar/quickstart:latest` image twice. Add an explicit `docker pull` step with
-retries (mirroring `stellar/quickstart@main`'s own action.yml pattern) run once up front.
-- [ ] Image pulled once, with retry-with-backoff, before either network starts
-- [ ] Unit test on the retry logic with a mocked `child_process`
-- Suggested files: `src/network/quickstart.ts`
+**Verification**
+After `npm run build`, reproduce any one row with
+`node dist/cli/index.js run --from 27 --to 28 --config <your config>`.
 
-### 16. Add a `list-scenarios --json` output mode
-For programmatic consumption (e.g. a PR-comment bot per issue #20) — currently `list-scenarios`
-only prints a human-readable line per scenario.
-- [ ] `--json` flag prints an array of `{name, contract, function, submit}`
-- [ ] Unit test covering the JSON shape
-- Suggested files: `src/cli/index.ts`
+---
 
-## High (4)
+### 3. Compare more than two protocol versions in one run
+**Complexity:** High
 
-### 17. Protocol matrix runs (compare N versions in one command)
-Extend `run` to accept a comma-separated list of protocol versions (`--protocols 27,28,29`) and
-diff each adjacent pair, producing one combined report — useful for seeing exactly which
-version introduced a change across a longer-supported contract.
-- [ ] `upgrade-preflight run --protocols 27,28,29` runs N networks sequentially and diffs N-1 pairs
-- [ ] Combined Markdown report clearly attributes each change to its version boundary
-- [ ] Existing two-version `--from`/`--to` usage keeps working unchanged
-- Suggested files: `src/cli/index.ts`, `src/runner/run.ts`, `src/report/markdown.ts`
+**Description**
+To see which protocol introduced a change you currently have to run several two-version
+comparisons by hand.
 
-### 18. A plugin system for custom scenario "checks" beyond return-value/event/cost diffing
-Let a contributor register a custom assertion function (e.g. "the emitted `transfer` event's
-`amount` topic must be within X of a computed value") that runs against both results and can
-independently flag a verdict, beyond the built-in return-value/events/cost comparison.
-- [ ] A documented plugin interface (`docs/ADDING_A_CHECK.md`)
-- [ ] At least one non-trivial example plugin ships in `examples/`
-- [ ] Plugin failures compose correctly into the overall verdict severity ordering
-- Suggested files: `src/diff/`, new `docs/ADDING_A_CHECK.md`
+**Current state**
+`upgrade-preflight run --from X --to Y` (`src/cli/index.ts`) boots exactly two networks on host
+ports 8000 and 8001, runs every scenario on both, and diffs once. The JSON report has
+`schemaVersion: 1` and a single `fromProtocol`/`toProtocol` pair.
 
-### 19. Replay real recorded Testnet transactions as scenarios
-Given a transaction hash, fetch its real operation + arguments from a public Testnet RPC/Horizon
-endpoint and auto-generate a scenario from it (deploying the same contract to the local network
-first), so a developer doesn't have to hand-write scenarios for cases they've already seen fail
-in the wild.
-- [ ] `upgrade-preflight import-tx --hash <hash> --network testnet` scaffolds a scenario
-- [ ] Handles the case where the referenced contract's wasm isn't available locally with a clear
-  error
-- Suggested files: new `src/import/`, `src/cli/index.ts`
+**What to build**
+`--protocols 27,28,29` that runs each version once, sequentially, and diffs each adjacent pair,
+producing one combined report that attributes each change to its version boundary.
 
-### 20. A PR-comment bot for the GitHub Action
-When run on a pull request, post the Markdown report as a PR comment (updating a previous
-comment rather than piling up new ones), in addition to the job summary the action already
-writes.
-- [ ] `action/action.yml` gains an opt-in `comment-on-pr: true` input
-- [ ] Uses the run's own `GITHUB_TOKEN` — no new secret required
-- [ ] Updates a single comment across re-runs instead of duplicating
-- Suggested files: `action/action.yml`, new `action/post-comment.sh`
+**Acceptance criteria**
+- [ ] `--from`/`--to` keeps working unchanged.
+- [ ] Each version's network is started once, not once per pair.
+- [ ] The Markdown report labels each change by boundary (for example "27 to 28").
+- [ ] The JSON report bumps `schemaVersion` and documents the new shape.
+- [ ] Unit tests cover pair generation and verdict attribution without Docker.
+
+**Out of scope**
+Running networks in parallel. Diffing non-adjacent versions.
+
+**Verification**
+Unit tests (`npm test`), plus a real run: `node dist/cli/index.js run --protocols 27,28`.
+
+---
+
+### 4. Add a real-world contract corpus
+**Complexity:** Medium
+
+**Description**
+The four example contracts are tiny, so the first real result says little about real contracts.
+
+**Current state**
+`examples/contracts/` has `hello-world`, `counter`, `heavy-loop` and `auth`, each with a
+checked-in `.wasm` under `examples/wasm/` and a `CHECKSUMS.txt`.
+
+**What to build**
+Add two or three contracts taken from an open-source upstream Stellar repository (for example
+one with token-style storage and events), pinned to a specific upstream commit and built with
+the documented steps. Add a second config, `preflight.corpus.config.yml`, with scenarios that
+cover a success path and one failure path per contract.
+
+**Acceptance criteria**
+- [ ] The upstream repository, commit and license are recorded next to the sources.
+- [ ] The wasm builds reproducibly and its checksum is added to `CHECKSUMS.txt`.
+- [ ] The PR includes the Markdown report from a real 27 to 28 run of the new config.
+
+**Out of scope**
+Downloading wasm at run time. Changing the diff logic.
+
+**Verification**
+Follow `examples/README.md` to build, then `node dist/cli/index.js run --from 27 --to 28 --config preflight.corpus.config.yml`.
+
+---
+
+### 5. Verify the checked-in wasm checksums in CI
+**Complexity:** Trivial
+
+**Description**
+A contract source change that forgets to rebuild its wasm would go unnoticed.
+
+**Current state**
+`examples/wasm/CHECKSUMS.txt` lists a SHA-256 per file in `sha256sum` format
+(`<hash> *<file>`). Nothing in `.github/workflows/ci.yml` checks it.
+
+**What to build**
+A CI step in the `unit` job that runs `sha256sum -c CHECKSUMS.txt` from `examples/wasm/` and
+fails with a message naming the mismatched file.
+
+**Acceptance criteria**
+- [ ] The step passes on `main` today.
+- [ ] Altering one byte of a wasm makes the step fail and name that file.
+
+**Out of scope**
+Rebuilding the wasm in CI.
+
+**Verification**
+Run the same `sha256sum -c` command locally before and after altering a copy of a wasm file.
+
+---
+
+### 6. Add a per-scenario timeout
+**Complexity:** Medium
+
+**Description**
+A hung RPC call stalls the whole run with no clear error.
+
+**Current state**
+`runScenario` in `src/runner/run.ts` has no explicit timeout around building, simulating or
+submitting a scenario. Only network startup is bounded (`waitHealthy`, 120 seconds).
+
+**What to build**
+An optional `timeoutMs` (per scenario, with a global default in the config schema) that turns a
+timed-out scenario into a result with `status: 'error'` and a clear message, which the diff
+engine already reports as `ERROR`.
+
+**Acceptance criteria**
+- [ ] A scenario that exceeds its timeout reports `ERROR` and the run continues.
+- [ ] The config schema documents the new field and its default.
+- [ ] A unit test uses an injected slow function and a fake clock.
+
+**Out of scope**
+Retrying a timed-out scenario.
+
+**Verification**
+`npm test`.
+
+---
+
+### 7. Post the report as a pull request comment from the GitHub Action
+**Complexity:** High
+
+**Description**
+The report is only visible in the job summary, which reviewers rarely open.
+
+**Current state**
+`action/action.yml` builds the CLI, runs it, and appends the Markdown to `$GITHUB_STEP_SUMMARY`.
+`docs/CI_USAGE.md` documents the inputs and exit codes.
+
+**What to build**
+An opt-in `comment-on-pr` input that posts the report as a PR comment using the run's own
+`GITHUB_TOKEN`, and updates that same comment on re-runs instead of adding new ones.
+
+**Acceptance criteria**
+- [ ] Re-running the workflow edits the existing comment.
+- [ ] It does nothing on non-PR events and when the token cannot write (for example fork PRs).
+- [ ] `docs/CI_USAGE.md` documents the input and the permissions it needs.
+
+**Out of scope**
+Other CI providers. Failing the build based on the comment.
+
+**Verification**
+Run the action from a test repository's pull request and link the resulting comment in your PR.
+
+---
+
+### 8. Import a scenario from a transaction hash
+**Complexity:** High
+
+**Description**
+Scenarios are hand-written YAML. A developer who saw a transaction fail has to translate it by
+hand.
+
+**Current state**
+`src/config/schema.ts` defines the scenario shape (contract, function, typed args). Argument
+encoding is in `src/sdk/args.ts`. There is no import path.
+
+**What to build**
+`upgrade-preflight import-tx --hash <hash> --rpc <url>` that fetches the transaction, decodes
+its contract invocation (contract, function, arguments), and prints a scenario in the existing
+YAML shape. Argument types the schema cannot express should produce a clear error, not a wrong
+scenario.
+
+**Acceptance criteria**
+- [ ] Works against a captured Testnet transaction fixture in unit tests, without network access.
+- [ ] A clear error when the invocation uses an unsupported argument type.
+- [ ] A clear message that the contract's wasm must be supplied separately.
+
+**Out of scope**
+Deploying the contract automatically. Mainnet credentials.
+
+**Verification**
+Unit tests with the fixture, plus a manual run against a public Testnet RPC.
+
+---
+
+### 9. Cover argument-encoding edge cases in tests
+**Complexity:** Trivial
+
+**Description**
+Bad arguments should fail with a clear message, and every supported type should be tested.
+
+**Current state**
+`src/sdk/args.test.ts` covers five cases: `u32`, an `i128` given as a string, `symbol`, the
+`source-account` sentinel, and `bytes` as hex. The schema also supports `i32`, `u64`, `i64`,
+`u128`, `bool`, `string` and `address`, which have no tests.
+
+**What to build**
+Tests for each untested type, including a non-ASCII `string`, `u64`/`i64`/`u128` boundary values,
+a negative value for an unsigned type, and an invalid `address`. Fix `toScVal` only if a test
+exposes a real bug.
+
+**Acceptance criteria**
+- [ ] Every type in `ScVarArgSchema` has at least one passing test.
+- [ ] Invalid input is asserted to throw with a readable message.
+
+**Out of scope**
+Adding new argument types.
+
+**Verification**
+`npm test`.
