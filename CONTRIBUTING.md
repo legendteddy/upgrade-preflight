@@ -50,8 +50,7 @@ import correctly. ESLint (`typescript-eslint` recommended rules) enforces the re
 ## How issues are rated for complexity
 
 Issues in [`ISSUES_BACKLOG.md`](ISSUES_BACKLOG.md) are rated **Trivial**, **Medium**, or
-**High**, matching the [Stellar Wave Program](https://docs.drips.network/wave/)'s complexity
-tiers:
+**High** by scope and complexity:
 
 - **Trivial**: typos, small bug fixes, a new example scenario, better error messages.
 - **Medium**: a standard new feature or an involved bug fix — a new report format, a new arg

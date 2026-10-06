@@ -4,6 +4,8 @@ Candidate issues, each written to be posted to GitHub as-is. Every entry states 
 state at a specific commit, what to build, how to verify it, and what is out of scope.
 Complexity (Trivial / Medium / High) follows the tiers in [`CONTRIBUTING.md`](CONTRIBUTING.md).
 If you pick one up, comment on the issue first so two people don't build the same thing.
+Entries marked **Posted on GitHub** are open issues: comment there, not here. The rest are
+candidates that have not been posted yet.
 
 Audited commit: `3235411`
 
@@ -11,6 +13,7 @@ Audited commit: `3235411`
 
 ### 1. Run a real two-protocol comparison in the CI integration job
 **Complexity:** Medium
+**Posted on GitHub:** #9
 
 **Description**
 The tool's central behavior (same scenarios on two protocol versions, then a diff) is only
@@ -139,6 +142,7 @@ Follow `examples/README.md` to build, then `node dist/cli/index.js run --from 27
 
 ### 5. Verify the checked-in wasm checksums in CI
 **Complexity:** Trivial
+**Posted on GitHub:** #7
 
 **Description**
 A contract source change that forgets to rebuild its wasm would go unnoticed.
@@ -165,6 +169,7 @@ Run the same `sha256sum -c` command locally before and after altering a copy of 
 
 ### 6. Add a per-scenario timeout
 **Complexity:** Medium
+**Posted on GitHub:** #10
 
 **Description**
 A hung RPC call stalls the whole run with no clear error.
@@ -250,6 +255,7 @@ Unit tests with the fixture, plus a manual run against a public Testnet RPC.
 
 ### 9. Cover argument-encoding edge cases in tests
 **Complexity:** Trivial
+**Posted on GitHub:** #8
 
 **Description**
 Bad arguments should fail with a clear message, and every supported type should be tested.

@@ -32,7 +32,8 @@ src/network/   the stellar/quickstart Docker driver: start, health-check, stop
 src/sdk/       thin wrappers around @stellar/stellar-sdk: account funding, arg encoding,
                contract deployment, transaction simulation + resource extraction
 src/runner/    orchestrates one full run against one protocol version: fund accounts,
-               deploy contracts, execute every scenario, always tear the network down
+               deploy contracts, execute every scenario, tear the network down in a `finally`
+               block (a killed process can still leave its container running)
 src/diff/      pure functions: given two ScenarioResult sets, produce verdicts and deltas
 src/report/    Markdown + JSON renderers over a RunDiff
 src/cli/       the `upgrade-preflight` command line entry point
