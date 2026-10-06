@@ -26,6 +26,14 @@ describe('toJsonReport', () => {
     expect(parsed.schemaVersion).toBe(1);
   });
 
+  it('records the quickstart image only when one is known', () => {
+    const run = diffRun(27, 28, [ok('a')], [ok('a')], () => 5);
+    expect(toJsonReport({ ...run, image: 'stellar/quickstart:v672-b1475.1-latest' }).image).toBe(
+      'stellar/quickstart:v672-b1475.1-latest'
+    );
+    expect('image' in toJsonReport(run)).toBe(false);
+  });
+
   it('includes a coverage note naming the scenario count', () => {
     const run = diffRun(27, 28, [ok('a'), ok('b')], [ok('a'), ok('b')], () => 5);
     const report = toJsonReport(run);

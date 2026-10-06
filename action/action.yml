@@ -11,6 +11,10 @@ inputs:
     description: 'Path to preflight.config.yml'
     required: false
     default: 'preflight.config.yml'
+  image:
+    description: 'stellar/quickstart image to run. Empty uses stellar/quickstart:latest, which moves, and the core version inside an image decides which protocols it can run, so pin a tag for reproducible results.'
+    required: false
+    default: ''
   node-version:
     description: 'Node.js version to run the CLI with'
     required: false
@@ -32,12 +36,20 @@ runs:
     - name: Run upgrade-preflight
       shell: bash
       working-directory: ${{ github.workspace }}
+      env:
+        IMAGE: ${{ inputs.image }}
       run: |
+        # GitHub runs bash with -e, which would abort here on a non-zero verdict exit code
+        # before the report is written to the job summary.
+        set +e
         REPORT_PATH="$RUNNER_TEMP/upgrade-preflight-report.md"
+        IMAGE_ARGS=()
+        if [ -n "$IMAGE" ]; then IMAGE_ARGS=(--image "$IMAGE"); fi
         node "${{ github.action_path }}/../dist/cli/index.js" run \
           --from "${{ inputs.from }}" \
           --to "${{ inputs.to }}" \
           --config "${{ inputs.config }}" \
+          "${IMAGE_ARGS[@]}" \
           --markdown-out "$REPORT_PATH"
         EXIT_CODE=$?
         if [ -f "$REPORT_PATH" ]; then

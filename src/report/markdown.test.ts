@@ -29,6 +29,14 @@ describe('toMarkdown', () => {
     expect(markdown).toContain('Overall verdict: ✅ SAME');
   });
 
+  it('names the quickstart image when one is recorded, and omits the line otherwise', () => {
+    const run = diffRun(27, 28, [ok('a')], [ok('a')], () => 5);
+    expect(toMarkdown({ ...run, image: 'stellar/quickstart:v672-b1475.1-latest' })).toContain(
+      'Quickstart image: `stellar/quickstart:v672-b1475.1-latest`'
+    );
+    expect(toMarkdown(run)).not.toContain('Quickstart image');
+  });
+
   it('lists every scenario in the table', () => {
     const run = diffRun(27, 28, [ok('a'), ok('b')], [ok('a'), ok('b')], () => 5);
     const markdown = toMarkdown(run);

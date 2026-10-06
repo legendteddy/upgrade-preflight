@@ -49,6 +49,10 @@ export interface ScenarioDiff {
 export interface RunDiff {
   fromProtocol: number;
   toProtocol: number;
+  /** The stellar/quickstart image both networks ran, when known. The image's core version
+   * decides which protocols it can run, and `latest` moves, so a result is only reproducible
+   * with the image recorded. */
+  image?: string;
   scenarios: ScenarioDiff[];
   overallVerdict: Verdict;
 }

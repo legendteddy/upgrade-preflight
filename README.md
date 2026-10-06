@@ -39,9 +39,9 @@ This runs the bundled `preflight.config.yml` and its four example contracts (see
 ## What has and hasn't been verified
 
 - The diff engine (verdict rules, thresholds, bigint-safe comparison) is unit-tested.
-- The automated CI integration test boots **one** `stellar/quickstart` network at protocol 27,
-  deploys the example contracts, runs every scenario, and checks resource data comes back. It
-  does not compare two protocol versions.
+- The automated CI integration test boots **one** `stellar/quickstart` network at protocol 27
+  (on a pinned image tag, see below), deploys the example contracts, runs every scenario, and
+  checks resource data comes back. It does not compare two protocol versions.
 - The full two-network comparison (`run --from X --to Y`) is exercised by the manual
   **Real cross-version diff** workflow (`.github/workflows/real-diff.yml`), which uploads the
   Markdown and JSON reports as artifacts. Before each report the tool checks that the RPC's
@@ -74,6 +74,37 @@ What this does and doesn't show:
   has not traced it to a specific protocol change.
 - The automated CI integration test still boots a single network. The two-network path runs only
   in the manual workflow above.
+
+### A second real result: protocol 28 → 29
+
+Taken the day after protocol 29's stellar-core release, on the then-current
+`stellar/quickstart:latest`. Two runs were identical. Details are in
+[`docs/samples/`](docs/samples/).
+
+| Scenario | Verdict | Instructions (28 → 29) |
+| --- | --- | --- |
+| say-hello | SAME | 336076 → 331176 (-1.5%) |
+| increment-counter | SAME | 338842 → 333954 (-1.4%) |
+| read-counter | SAME | 331274 → 325386 (-1.8%) |
+| sum-to-1000 | SAME | 311611 → 306731 (-1.6%) |
+| restricted-call | SAME | 324317 → 319423 (-1.5%) |
+
+All verdicts are `SAME` because the changes are under the default 5% threshold; behavior, events
+and every other resource are identical. The protocol 28 figures here match the protocol 28
+figures in the 27 → 28 table exactly, even though they came from different image builds.
+
+### The quickstart image decides what you can test
+
+The core version inside a `stellar/quickstart` image determines which protocols it can run, and
+`latest` moves. On 2026-10-06 `latest` was republished; after that, protocol 27 stopped running
+on it (the first contract upload failed with a host error), while 28 and 29 ran fine. The
+27 → 28 result above was taken on the image that `latest` pointed to before that
+(`v672-b1475.1-latest`). The cause inside the image has not been investigated.
+
+- Pass `--image <ref>` (CLI) or the `image` input (Action and workflow) to choose the image. The
+  report records it.
+- The CI integration test pins a tag so it doesn't break when `latest` moves.
+- For reproducible results, pin a tag from Docker Hub's list; for a new protocol, use a newer one.
 
 ## How verdicts work, and their limits
 

@@ -4,6 +4,8 @@ export interface JsonReport {
   schemaVersion: 1;
   fromProtocol: number;
   toProtocol: number;
+  /** The quickstart image both networks ran; absent in reports from before it was recorded. */
+  image?: string;
   overallVerdict: RunDiff['overallVerdict'];
   scenarios: RunDiff['scenarios'];
   coverageNote: string;
@@ -14,6 +16,7 @@ export function toJsonReport(diff: RunDiff): JsonReport {
     schemaVersion: 1,
     fromProtocol: diff.fromProtocol,
     toProtocol: diff.toProtocol,
+    ...(diff.image ? { image: diff.image } : {}),
     overallVerdict: diff.overallVerdict,
     scenarios: diff.scenarios,
     coverageNote: `This report covers only the ${diff.scenarios.length} scenario(s) defined in the config. Untested code paths are not covered.`,

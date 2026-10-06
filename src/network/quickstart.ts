@@ -26,7 +26,7 @@ export const STANDALONE_NETWORK_PASSPHRASE = 'Standalone Network ; February 2017
 
 /** Real, load-bearing fact verified against
  * https://raw.githubusercontent.com/stellar/quickstart/master/README.md on 2026-09-29 — see PLAN.md. */
-const DEFAULT_IMAGE = 'stellar/quickstart:latest';
+export const DEFAULT_IMAGE = 'stellar/quickstart:latest';
 
 export async function startQuickstart(opts: QuickstartOptions): Promise<QuickstartNetwork> {
   const image = opts.image ?? DEFAULT_IMAGE;

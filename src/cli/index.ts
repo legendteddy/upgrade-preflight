@@ -9,6 +9,7 @@ import { toMarkdown } from '../report/markdown.js';
 import { toJson } from '../report/json.js';
 import { runAgainstProtocol } from '../runner/run.js';
 import { isDockerAvailable } from '../network/docker-available.js';
+import { DEFAULT_IMAGE } from '../network/quickstart.js';
 import { writeFile } from 'node:fs/promises';
 
 const program = new Command();
@@ -24,6 +25,10 @@ program
   .requiredOption('--from <protocol>', 'baseline protocol version', parseIntOption)
   .requiredOption('--to <protocol>', 'target protocol version', parseIntOption)
   .option('-c, --config <path>', 'path to preflight.config.yml', 'preflight.config.yml')
+  .option(
+    '--image <ref>',
+    `stellar/quickstart image to run (default: ${DEFAULT_IMAGE}). "latest" moves, and the image's core version decides which protocols it can run; pin a tag such as stellar/quickstart:v672-b1475.1-latest for reproducible results.`
+  )
   .option('--markdown-out <path>', 'write the Markdown report to this file')
   .option('--json-out <path>', 'write the JSON report to this file')
   .action(async (options) => {
@@ -44,23 +49,26 @@ program
       return entry?.thresholds?.costPercent ?? config.thresholds.costPercent;
     };
 
+    const image: string = options.image ?? DEFAULT_IMAGE;
     let baselineResults: ScenarioResult[];
     let targetResults: ScenarioResult[];
     try {
-      console.error(`Starting baseline network (protocol ${options.from})...`);
+      console.error(`Starting baseline network (protocol ${options.from}, image ${image})...`);
       baselineResults = await runAgainstProtocol(config, {
         hostPort: 8000,
         containerName: `upgrade-preflight-${options.from}`,
         protocolVersion: options.from,
         configDir,
+        image,
       });
 
-      console.error(`Starting target network (protocol ${options.to})...`);
+      console.error(`Starting target network (protocol ${options.to}, image ${image})...`);
       targetResults = await runAgainstProtocol(config, {
         hostPort: 8001,
         containerName: `upgrade-preflight-${options.to}`,
         protocolVersion: options.to,
         configDir,
+        image,
       });
     } catch (err) {
       // A network that never came up, or one not running the requested protocol, is a tool
@@ -70,7 +78,10 @@ program
       return;
     }
 
-    const diff = diffRun(options.from, options.to, baselineResults, targetResults, costThresholdFor);
+    const diff = {
+      ...diffRun(options.from, options.to, baselineResults, targetResults, costThresholdFor),
+      image,
+    };
 
     const markdown = toMarkdown(diff);
     console.log(markdown);

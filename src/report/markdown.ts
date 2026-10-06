@@ -17,6 +17,9 @@ export function toMarkdown(diff: RunDiff): string {
     `**Overall verdict: ${VERDICT_EMOJI[diff.overallVerdict]} ${diff.overallVerdict}**`,
     ''
   );
+  if (diff.image) {
+    lines.push(`Quickstart image: \`${diff.image}\``, '');
+  }
 
   lines.push('| Scenario | Verdict | Baseline | Target | Notes |', '| --- | --- | --- | --- | --- |');
   for (const scenario of diff.scenarios) {

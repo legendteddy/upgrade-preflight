@@ -1,0 +1,19 @@
+{
+  "kind": "Recorded",
+  "description": "Output of a real cross-version run: two stellar/quickstart networks, protocol 28 and 29, the bundled preflight.config.yml and its four example contracts.",
+  "source": "GitHub Actions workflow \"Real cross-version diff\" (.github/workflows/real-diff.yml)",
+  "runUrl": "https://github.com/stellarbrief/upgrade-preflight/actions/runs/37441697710",
+  "capturedAt": "2026-10-06T09:15:24Z",
+  "commit": "6e441d100dd1144765500796374be9d094992340",
+  "command": "node dist/cli/index.js run --from 28 --to 29 --markdown-out report.md --json-out report.json",
+  "image": "stellar/quickstart:latest (not recorded in the report; this run predates the --image option)",
+  "imageNote": "Docker Hub's tag list shows `latest` was last published at 2026-10-06T02:51Z as v676-b1505.1-latest, so that is almost certainly the image this run used. This is inferred from tag timestamps, not read from the run.",
+  "files": ["28-to-29.report.json", "28-to-29.report.md"],
+  "notes": [
+    "Files are the unmodified workflow artifacts, copied byte for byte.",
+    "A second run (run 37441747085) produced identical verdicts, resources and fees.",
+    "The protocol 28 figures here match the protocol 28 figures in the 27-to-28 sample exactly, across different quickstart image builds.",
+    "Costs are RPC simulateTransaction estimates for tiny example contracts, not on-ledger metered costs.",
+    "The cause of the roughly 1.5% instruction decrease has not been traced."
+  ]
+}

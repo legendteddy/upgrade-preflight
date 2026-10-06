@@ -22,6 +22,8 @@ export interface RunOptions {
   containerName: string;
   protocolVersion: number;
   configDir: string;
+  /** stellar/quickstart image reference; defaults to `stellar/quickstart:latest`. */
+  image?: string;
 }
 
 /** Runs an entire config (fund accounts, deploy contracts, execute every scenario) against one
@@ -34,6 +36,7 @@ export async function runAgainstProtocol(
     containerName: opts.containerName,
     hostPort: opts.hostPort,
     protocolVersion: opts.protocolVersion,
+    image: opts.image,
   });
 
   try {

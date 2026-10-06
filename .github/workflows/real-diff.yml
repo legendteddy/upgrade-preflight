@@ -4,6 +4,11 @@ name: Real cross-version diff
 # versions, the same scenarios against both, and a diff. The main CI's integration job only boots
 # one network, so this is the only place the two-network path is exercised for real. Manual-only
 # because it takes several minutes; trigger from the Actions tab or `gh workflow run`.
+#
+# The image matters. `stellar/quickstart:latest` moves, and an image's core version decides which
+# protocols it can run: on 2026-10-06 `latest` was republished and protocol 27 stopped working on
+# it, while protocols 28 and 29 ran fine. The default below is the tag that produced the
+# recorded 27 -> 28 result; for newer protocols pass a newer tag (see Docker Hub's tag list).
 on:
   workflow_dispatch:
     inputs:
@@ -13,6 +18,9 @@ on:
       to:
         description: Target protocol version
         default: '28'
+      image:
+        description: stellar/quickstart image reference
+        default: stellar/quickstart:v672-b1475.1-latest
 
 jobs:
   diff:
@@ -26,13 +34,14 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run build
-      - run: docker pull stellar/quickstart:latest
+      - run: docker pull "${{ inputs.image }}"
       - name: Run ${{ inputs.from }} -> ${{ inputs.to }}
         # Exit 1 (BEHAVIOR_CHANGED/BROKE) is a real result worth reporting, not a tool failure.
         # Only 2 (ERROR: a network never came up, a result went missing) or higher fails the job.
         run: |
           set +e
           node dist/cli/index.js run --from "${{ inputs.from }}" --to "${{ inputs.to }}" \
+            --image "${{ inputs.image }}" \
             --markdown-out report.md --json-out report.json
           code=$?
           echo "CLI exited with code $code"

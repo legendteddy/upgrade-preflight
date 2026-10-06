@@ -1,5 +1,16 @@
 # Changelog
 
+## Unreleased
+
+- Added `--image` (CLI), an `image` input (Action and the real-diff workflow), and an `image`
+  field in the reports, because `stellar/quickstart:latest` moves and its core version decides
+  which protocols can run. Found when `latest` was republished on 2026-10-06 and protocol 27
+  stopped running on it.
+- The CI integration test now pins a quickstart tag.
+- Fixed the Action aborting before writing the report to the job summary on a non-zero verdict
+  exit code. The Action is still not verified end to end.
+- Added a real protocol 28 to 29 sample (`docs/samples/`).
+
 ## 0.1.0
 
 First tagged version.

@@ -24,6 +24,23 @@ report to the job summary.
   NOT a statement about your contract; re-run once the underlying issue (usually Docker/image
   availability) is fixed.
 
+## Choosing the quickstart image
+
+The `image` input (CLI: `--image`) selects the `stellar/quickstart` image. It defaults to
+`stellar/quickstart:latest`, which moves, and the core version inside an image decides which
+protocols it can run: after `latest` was republished on 2026-10-06, protocol 27 no longer ran on
+it. For reproducible CI, pin a tag from Docker Hub and bump it deliberately:
+
+```yaml
+- uses: stellarbrief/upgrade-preflight/action@main
+  with:
+    from: '27'
+    to: '28'
+    image: stellar/quickstart:v672-b1475.1-latest
+```
+
+The report records the image that was used.
+
 ## Running it locally first
 
 ```bash
