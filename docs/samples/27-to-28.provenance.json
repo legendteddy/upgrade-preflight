@@ -16,6 +16,7 @@
     "Files are the unmodified workflow artifacts, copied byte for byte.",
     "An earlier run (run 37380720125, before the ledger-protocol check existed) produced identical numbers.",
     "Costs are RPC simulateTransaction estimates for tiny example contracts, not on-ledger metered costs.",
-    "The cause of the 5.8% to 8.9% instruction decrease has not been traced."
+    "The cause of the 5.8% to 8.9% instruction decrease has not been traced.",
+    "Reproduced exactly on 2026-10-06 with --image stellar/quickstart:v672-b1475.1-latest (run 37448271677, recorded in that report): all resources, fees, return values, normalized events and verdicts were identical, field by field. This confirms that v672 runs both protocol 27 and 28 and matches the image this sample was taken on."
   ]
 }
