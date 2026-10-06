@@ -109,6 +109,21 @@ cause wasn't fully isolated beyond that — noted here rather than left silent, 
 adding this line fix it" is exactly the kind of thing a future contributor hitting the same
 error would want on record.
 
+**Real bug caught by CI's `integration` job on first push (2026-09-30)**: the `unit` job passed,
+but `integration` — which actually runs on Docker, since GitHub-hosted `ubuntu-latest` runners
+have it, unlike this build environment — genuinely booted two real quickstart networks and hit
+`TypeError: Do not know how to serialize a BigInt` inside `diffScenario`'s return-value
+comparison. Root cause: `scValToNative` decodes Soroban's 64/128-bit integer types (u64, i64,
+u128, i128 — exactly what the `heavy-loop` example's `sum_to` returns) as native JS `bigint`,
+and plain `JSON.stringify` throws outright on a `bigint` rather than coercing or dropping it.
+The same bug existed in `src/report/json.ts`'s `toJson` too, for the same reason, just never
+exercised because no unit test's fixtures used a bigint return value. Fixed both call sites with
+a `JSON.stringify` replacer that tags `bigint` values as `"<n>n"` strings; added regression
+tests in `engine.test.ts` and `json.test.ts` using a real bigint return value. This is exactly
+the kind of thing the two-stage CI (`unit` first, `integration` second, on real Docker) is
+designed to catch — the local `test:integration` skip path could never have found it, since it
+skips whenever Docker is unavailable, which was the case for the entire local build.
+
 ## Architecture
 
 ```
