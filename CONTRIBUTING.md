@@ -58,3 +58,17 @@ tiers:
   type, CI improvements.
 - **High**: a complex feature, refactor, or new integration — a new network backend, a plugin
   system, protocol-matrix (N-version) runs.
+
+## How maintainers work here
+
+- There is currently one maintainer. Response times are best effort; there is no guaranteed
+  turnaround.
+- A bug report is reproduced before a fix is accepted. A feature is discussed in its issue
+  before a PR is opened.
+- CI (lint, typecheck, tests, build, and the integration job) must pass before merge.
+- A change that affects a documented claim updates the docs in the same PR. A claim about
+  behavior is accepted only with a test or a real run behind it.
+- Changes to verdict rules, the config schema or the JSON report shape need maintainer approval,
+  and a JSON shape change bumps `schemaVersion` and is noted in `CHANGELOG.md`.
+- Releases are tags (`vX.Y.Z`) on `main` after CI is green, with notes taken from `CHANGELOG.md`.
+- Security reports: see [`SECURITY.md`](SECURITY.md).
