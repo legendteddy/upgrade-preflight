@@ -12,9 +12,10 @@ don't have an equivalent.
 `upgrade-preflight` runs the *same* set of scenarios (contract calls) against two real local
 networks — one on the baseline protocol version, one on the target — using
 [`stellar/quickstart`](https://github.com/stellar/quickstart)'s `--local` mode, then diffs the
-captured results. Nothing is simulated or guessed: both runs execute real transactions (via
-`simulateTransaction`, and real submission for scenarios marked `submit: true`) against a real
-`stellar-core` + `stellar-rpc` stack.
+captured results. The networks are real (a real `stellar-core` + `stellar-rpc` stack, nothing
+mocked), but most scenarios are measured with the RPC's `simulateTransaction`, so their costs
+are simulation estimates. Only scenarios marked `submit: true` are actually submitted to the
+network.
 
 **Identity normalization.** Each network deploys with freshly generated accounts, so the same
 contract gets a different contract ID on each network, and those IDs are embedded in raw event
