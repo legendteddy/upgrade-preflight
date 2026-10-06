@@ -7,6 +7,10 @@ tooling built around them; contract developers get a short Testnet window before
 vote and no easy way to answer "will my contract break or get more expensive on the new
 protocol?" This does that check, deterministically, with no AI/LLM involved anywhere.
 
+**See a real result without Docker:** the
+[Upgrade Preflight playground](https://stellarbrief.github.io/playground/preflight/) shows the real
+recorded 27 to 28 and 28 to 29 reports and re-runs this tool's diff engine on them in your browser.
+
 ## How it works
 
 1. You describe a set of contract-call scenarios in `preflight.config.yml`.
