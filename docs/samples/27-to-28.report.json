@@ -1,0 +1,425 @@
+{
+  "schemaVersion": 1,
+  "fromProtocol": 27,
+  "toProtocol": 28,
+  "overallVerdict": "COSTS_CHANGED",
+  "scenarios": [
+    {
+      "scenario": "say-hello",
+      "verdict": "COSTS_CHANGED",
+      "reason": "Same behavior, but resource usage changed beyond the 5% threshold: instructions -6.6% (360010 -> 336076).",
+      "baseline": {
+        "scenario": "say-hello",
+        "status": "ok",
+        "success": true,
+        "returnValue": [
+          "Hello",
+          "preflight"
+        ],
+        "contractError": null,
+        "events": [
+          "AAAAAQAAAAAAAAAAAAAAAgAAAAAAAAADAAAADwAAAAdmbl9jYWxsAAAAAA0AAAAgsEVsAJIToErqtZl+ArKgKBDJ6mbJjy+mtndYSC+n+KsAAAAPAAAABWhlbGxvAAAAAAAADgAAAAlwcmVmbGlnaHQAAAA=",
+          "AAAAAQAAAAAAAAABsEVsAJIToErqtZl+ArKgKBDJ6mbJjy+mtndYSC+n+KsAAAACAAAAAAAAAAIAAAAPAAAACWZuX3JldHVybgAAAAAAAA8AAAAFaGVsbG8AAAAAAAAQAAAAAQAAAAIAAAAOAAAABUhlbGxvAAAAAAAADgAAAAlwcmVmbGlnaHQAAAA="
+        ],
+        "resources": {
+          "instructions": 360010,
+          "diskReadBytes": 0,
+          "writeBytes": 0,
+          "readEntries": 2,
+          "writeEntries": 0
+        },
+        "minResourceFee": "12911"
+      },
+      "target": {
+        "scenario": "say-hello",
+        "status": "ok",
+        "success": true,
+        "returnValue": [
+          "Hello",
+          "preflight"
+        ],
+        "contractError": null,
+        "events": [
+          "AAAAAQAAAAAAAAAAAAAAAgAAAAAAAAADAAAADwAAAAdmbl9jYWxsAAAAAA0AAAAgsEVsAJIToErqtZl+ArKgKBDJ6mbJjy+mtndYSC+n+KsAAAAPAAAABWhlbGxvAAAAAAAADgAAAAlwcmVmbGlnaHQAAAA=",
+          "AAAAAQAAAAAAAAABsEVsAJIToErqtZl+ArKgKBDJ6mbJjy+mtndYSC+n+KsAAAACAAAAAAAAAAIAAAAPAAAACWZuX3JldHVybgAAAAAAAA8AAAAFaGVsbG8AAAAAAAAQAAAAAQAAAAIAAAAOAAAABUhlbGxvAAAAAAAADgAAAAlwcmVmbGlnaHQAAAA="
+        ],
+        "resources": {
+          "instructions": 336076,
+          "diskReadBytes": 0,
+          "writeBytes": 0,
+          "readEntries": 2,
+          "writeEntries": 0
+        },
+        "minResourceFee": "12894"
+      },
+      "resourceDeltas": [
+        {
+          "metric": "instructions",
+          "baseline": 360010,
+          "target": 336076,
+          "percentChange": -6.648148662537151
+        },
+        {
+          "metric": "diskReadBytes",
+          "baseline": 0,
+          "target": 0,
+          "percentChange": 0
+        },
+        {
+          "metric": "writeBytes",
+          "baseline": 0,
+          "target": 0,
+          "percentChange": 0
+        },
+        {
+          "metric": "readEntries",
+          "baseline": 2,
+          "target": 2,
+          "percentChange": 0
+        },
+        {
+          "metric": "writeEntries",
+          "baseline": 0,
+          "target": 0,
+          "percentChange": 0
+        },
+        {
+          "metric": "minResourceFee",
+          "baseline": 12911,
+          "target": 12894,
+          "percentChange": -0.1316706684222756
+        }
+      ],
+      "costThresholdPercent": 5
+    },
+    {
+      "scenario": "increment-counter",
+      "verdict": "COSTS_CHANGED",
+      "reason": "Same behavior, but resource usage changed beyond the 5% threshold: instructions -8.0% (368190 -> 338842).",
+      "baseline": {
+        "scenario": "increment-counter",
+        "status": "ok",
+        "success": true,
+        "returnValue": 1,
+        "contractError": null,
+        "events": [
+          "AAAAAQAAAAAAAAAAAAAAAgAAAAAAAAADAAAADwAAAAdmbl9jYWxsAAAAAA0AAAAg/L3FxLuI1+HgzCNTdklGdCOxAXFjQaM3Dqimbwp3reEAAAAPAAAACWluY3JlbWVudAAAAAAAAAE=",
+          "AAAAAQAAAAAAAAAB/L3FxLuI1+HgzCNTdklGdCOxAXFjQaM3Dqimbwp3reEAAAACAAAAAAAAAAIAAAAPAAAACWZuX3JldHVybgAAAAAAAA8AAAAJaW5jcmVtZW50AAAAAAAAAwAAAAE="
+        ],
+        "resources": {
+          "instructions": 368190,
+          "diskReadBytes": 0,
+          "writeBytes": 132,
+          "readEntries": 2,
+          "writeEntries": 1
+        },
+        "minResourceFee": "18365"
+      },
+      "target": {
+        "scenario": "increment-counter",
+        "status": "ok",
+        "success": true,
+        "returnValue": 1,
+        "contractError": null,
+        "events": [
+          "AAAAAQAAAAAAAAAAAAAAAgAAAAAAAAADAAAADwAAAAdmbl9jYWxsAAAAAA0AAAAg/L3FxLuI1+HgzCNTdklGdCOxAXFjQaM3Dqimbwp3reEAAAAPAAAACWluY3JlbWVudAAAAAAAAAE=",
+          "AAAAAQAAAAAAAAAB/L3FxLuI1+HgzCNTdklGdCOxAXFjQaM3Dqimbwp3reEAAAACAAAAAAAAAAIAAAAPAAAACWZuX3JldHVybgAAAAAAAA8AAAAJaW5jcmVtZW50AAAAAAAAAwAAAAE="
+        ],
+        "resources": {
+          "instructions": 338842,
+          "diskReadBytes": 0,
+          "writeBytes": 132,
+          "readEntries": 2,
+          "writeEntries": 1
+        },
+        "minResourceFee": "18345"
+      },
+      "resourceDeltas": [
+        {
+          "metric": "instructions",
+          "baseline": 368190,
+          "target": 338842,
+          "percentChange": -7.970884597626225
+        },
+        {
+          "metric": "diskReadBytes",
+          "baseline": 0,
+          "target": 0,
+          "percentChange": 0
+        },
+        {
+          "metric": "writeBytes",
+          "baseline": 132,
+          "target": 132,
+          "percentChange": 0
+        },
+        {
+          "metric": "readEntries",
+          "baseline": 2,
+          "target": 2,
+          "percentChange": 0
+        },
+        {
+          "metric": "writeEntries",
+          "baseline": 1,
+          "target": 1,
+          "percentChange": 0
+        },
+        {
+          "metric": "minResourceFee",
+          "baseline": 18365,
+          "target": 18345,
+          "percentChange": -0.10890280424720937
+        }
+      ],
+      "costThresholdPercent": 5
+    },
+    {
+      "scenario": "read-counter",
+      "verdict": "COSTS_CHANGED",
+      "reason": "Same behavior, but resource usage changed beyond the 5% threshold: instructions -8.6% (362598 -> 331274).",
+      "baseline": {
+        "scenario": "read-counter",
+        "status": "ok",
+        "success": true,
+        "returnValue": 1,
+        "contractError": null,
+        "events": [
+          "AAAAAQAAAAAAAAAAAAAAAgAAAAAAAAADAAAADwAAAAdmbl9jYWxsAAAAAA0AAAAg/L3FxLuI1+HgzCNTdklGdCOxAXFjQaM3Dqimbwp3reEAAAAPAAAAA2dldAAAAAAB",
+          "AAAAAQAAAAAAAAAB/L3FxLuI1+HgzCNTdklGdCOxAXFjQaM3Dqimbwp3reEAAAACAAAAAAAAAAIAAAAPAAAACWZuX3JldHVybgAAAAAAAA8AAAADZ2V0AAAAAAMAAAAB"
+        ],
+        "resources": {
+          "instructions": 362598,
+          "diskReadBytes": 0,
+          "writeBytes": 0,
+          "readEntries": 2,
+          "writeEntries": 0
+        },
+        "minResourceFee": "12583"
+      },
+      "target": {
+        "scenario": "read-counter",
+        "status": "ok",
+        "success": true,
+        "returnValue": 1,
+        "contractError": null,
+        "events": [
+          "AAAAAQAAAAAAAAAAAAAAAgAAAAAAAAADAAAADwAAAAdmbl9jYWxsAAAAAA0AAAAg/L3FxLuI1+HgzCNTdklGdCOxAXFjQaM3Dqimbwp3reEAAAAPAAAAA2dldAAAAAAB",
+          "AAAAAQAAAAAAAAAB/L3FxLuI1+HgzCNTdklGdCOxAXFjQaM3Dqimbwp3reEAAAACAAAAAAAAAAIAAAAPAAAACWZuX3JldHVybgAAAAAAAA8AAAADZ2V0AAAAAAMAAAAB"
+        ],
+        "resources": {
+          "instructions": 331274,
+          "diskReadBytes": 0,
+          "writeBytes": 0,
+          "readEntries": 2,
+          "writeEntries": 0
+        },
+        "minResourceFee": "12561"
+      },
+      "resourceDeltas": [
+        {
+          "metric": "instructions",
+          "baseline": 362598,
+          "target": 331274,
+          "percentChange": -8.638768002029797
+        },
+        {
+          "metric": "diskReadBytes",
+          "baseline": 0,
+          "target": 0,
+          "percentChange": 0
+        },
+        {
+          "metric": "writeBytes",
+          "baseline": 0,
+          "target": 0,
+          "percentChange": 0
+        },
+        {
+          "metric": "readEntries",
+          "baseline": 2,
+          "target": 2,
+          "percentChange": 0
+        },
+        {
+          "metric": "writeEntries",
+          "baseline": 0,
+          "target": 0,
+          "percentChange": 0
+        },
+        {
+          "metric": "minResourceFee",
+          "baseline": 12583,
+          "target": 12561,
+          "percentChange": -0.17483906858459827
+        }
+      ],
+      "costThresholdPercent": 5
+    },
+    {
+      "scenario": "sum-to-1000",
+      "verdict": "COSTS_CHANGED",
+      "reason": "Same behavior, but resource usage changed beyond the 5% threshold: instructions -8.9% (342106 -> 311611).",
+      "baseline": {
+        "scenario": "sum-to-1000",
+        "status": "ok",
+        "success": true,
+        "returnValue": "500500n",
+        "contractError": null,
+        "events": [
+          "AAAAAQAAAAAAAAAAAAAAAgAAAAAAAAADAAAADwAAAAdmbl9jYWxsAAAAAA0AAAAg4HcLUs1rAykabdZWgd85zNg3nmfi4njhvmzpy7YAZlwAAAAPAAAABnN1bV90bwAAAAAAAwAAA+g=",
+          "AAAAAQAAAAAAAAAB4HcLUs1rAykabdZWgd85zNg3nmfi4njhvmzpy7YAZlwAAAACAAAAAAAAAAIAAAAPAAAACWZuX3JldHVybgAAAAAAAA8AAAAGc3VtX3RvAAAAAAAFAAAAAAAHoxQ="
+        ],
+        "resources": {
+          "instructions": 342106,
+          "diskReadBytes": 0,
+          "writeBytes": 0,
+          "readEntries": 2,
+          "writeEntries": 0
+        },
+        "minResourceFee": "12642"
+      },
+      "target": {
+        "scenario": "sum-to-1000",
+        "status": "ok",
+        "success": true,
+        "returnValue": "500500n",
+        "contractError": null,
+        "events": [
+          "AAAAAQAAAAAAAAAAAAAAAgAAAAAAAAADAAAADwAAAAdmbl9jYWxsAAAAAA0AAAAg4HcLUs1rAykabdZWgd85zNg3nmfi4njhvmzpy7YAZlwAAAAPAAAABnN1bV90bwAAAAAAAwAAA+g=",
+          "AAAAAQAAAAAAAAAB4HcLUs1rAykabdZWgd85zNg3nmfi4njhvmzpy7YAZlwAAAACAAAAAAAAAAIAAAAPAAAACWZuX3JldHVybgAAAAAAAA8AAAAGc3VtX3RvAAAAAAAFAAAAAAAHoxQ="
+        ],
+        "resources": {
+          "instructions": 311611,
+          "diskReadBytes": 0,
+          "writeBytes": 0,
+          "readEntries": 2,
+          "writeEntries": 0
+        },
+        "minResourceFee": "12621"
+      },
+      "resourceDeltas": [
+        {
+          "metric": "instructions",
+          "baseline": 342106,
+          "target": 311611,
+          "percentChange": -8.913903877745494
+        },
+        {
+          "metric": "diskReadBytes",
+          "baseline": 0,
+          "target": 0,
+          "percentChange": 0
+        },
+        {
+          "metric": "writeBytes",
+          "baseline": 0,
+          "target": 0,
+          "percentChange": 0
+        },
+        {
+          "metric": "readEntries",
+          "baseline": 2,
+          "target": 2,
+          "percentChange": 0
+        },
+        {
+          "metric": "writeEntries",
+          "baseline": 0,
+          "target": 0,
+          "percentChange": 0
+        },
+        {
+          "metric": "minResourceFee",
+          "baseline": 12642,
+          "target": 12621,
+          "percentChange": -0.16611295681063123
+        }
+      ],
+      "costThresholdPercent": 5
+    },
+    {
+      "scenario": "restricted-call",
+      "verdict": "COSTS_CHANGED",
+      "reason": "Same behavior, but resource usage changed beyond the 5% threshold: instructions -5.8% (344204 -> 324317).",
+      "baseline": {
+        "scenario": "restricted-call",
+        "status": "ok",
+        "success": true,
+        "returnValue": 1,
+        "contractError": null,
+        "events": [
+          "AAAAAQAAAAAAAAAAAAAAAgAAAAAAAAADAAAADwAAAAdmbl9jYWxsAAAAAA0AAAAgx9VQCmj24opBevAjGHOTRZLOzv3nmhOZgdsh8x+tiwYAAAAPAAAACnJlc3RyaWN0ZWQAAAAAABIAAAAAAAAAAC17XHK1KtEOjbcf2CGEkcqiIj+AGJLYu9xapXhatcih",
+          "AAAAAQAAAAAAAAABx9VQCmj24opBevAjGHOTRZLOzv3nmhOZgdsh8x+tiwYAAAACAAAAAAAAAAIAAAAPAAAACWZuX3JldHVybgAAAAAAAA8AAAAKcmVzdHJpY3RlZAAAAAAAAwAAAAE="
+        ],
+        "resources": {
+          "instructions": 344204,
+          "diskReadBytes": 0,
+          "writeBytes": 0,
+          "readEntries": 2,
+          "writeEntries": 0
+        },
+        "minResourceFee": "13285"
+      },
+      "target": {
+        "scenario": "restricted-call",
+        "status": "ok",
+        "success": true,
+        "returnValue": 1,
+        "contractError": null,
+        "events": [
+          "AAAAAQAAAAAAAAAAAAAAAgAAAAAAAAADAAAADwAAAAdmbl9jYWxsAAAAAA0AAAAgx9VQCmj24opBevAjGHOTRZLOzv3nmhOZgdsh8x+tiwYAAAAPAAAACnJlc3RyaWN0ZWQAAAAAABIAAAAAAAAAAC17XHK1KtEOjbcf2CGEkcqiIj+AGJLYu9xapXhatcih",
+          "AAAAAQAAAAAAAAABx9VQCmj24opBevAjGHOTRZLOzv3nmhOZgdsh8x+tiwYAAAACAAAAAAAAAAIAAAAPAAAACWZuX3JldHVybgAAAAAAAA8AAAAKcmVzdHJpY3RlZAAAAAAAAwAAAAE="
+        ],
+        "resources": {
+          "instructions": 324317,
+          "diskReadBytes": 0,
+          "writeBytes": 0,
+          "readEntries": 2,
+          "writeEntries": 0
+        },
+        "minResourceFee": "13272"
+      },
+      "resourceDeltas": [
+        {
+          "metric": "instructions",
+          "baseline": 344204,
+          "target": 324317,
+          "percentChange": -5.777678353534532
+        },
+        {
+          "metric": "diskReadBytes",
+          "baseline": 0,
+          "target": 0,
+          "percentChange": 0
+        },
+        {
+          "metric": "writeBytes",
+          "baseline": 0,
+          "target": 0,
+          "percentChange": 0
+        },
+        {
+          "metric": "readEntries",
+          "baseline": 2,
+          "target": 2,
+          "percentChange": 0
+        },
+        {
+          "metric": "writeEntries",
+          "baseline": 0,
+          "target": 0,
+          "percentChange": 0
+        },
+        {
+          "metric": "minResourceFee",
+          "baseline": 13285,
+          "target": 13272,
+          "percentChange": -0.09785472337222431
+        }
+      ],
+      "costThresholdPercent": 5
+    }
+  ],
+  "coverageNote": "This report covers only the 5 scenario(s) defined in the config. Untested code paths are not covered."
+}

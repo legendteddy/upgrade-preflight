@@ -51,7 +51,8 @@ This runs the bundled `preflight.config.yml` and its four example contracts (see
 ### A real captured result: protocol 27 → 28
 
 From the workflow's runs on the bundled `preflight.config.yml` and its four example contracts.
-Two independent runs produced identical numbers.
+Two independent runs produced identical numbers. The full report and where it came from are in
+[`docs/samples/`](docs/samples/).
 
 | Scenario | Verdict | Instructions (27 → 28) |
 | --- | --- | --- |

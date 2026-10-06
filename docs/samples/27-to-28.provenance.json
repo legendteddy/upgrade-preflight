@@ -1,0 +1,16 @@
+{
+  "kind": "Recorded",
+  "description": "Output of a real cross-version run: two stellar/quickstart networks, protocol 27 and 28, the bundled preflight.config.yml and its four example contracts.",
+  "source": "GitHub Actions workflow \"Real cross-version diff\" (.github/workflows/real-diff.yml)",
+  "runUrl": "https://github.com/stellarbrief/upgrade-preflight/actions/runs/37383134455",
+  "capturedAt": "2026-10-05T22:32:34Z",
+  "commit": "0a8f97f607d7a7a67987b1e11eb35d5cdf2bbb35",
+  "command": "node dist/cli/index.js run --from 27 --to 28 --markdown-out report.md --json-out report.json",
+  "files": ["27-to-28.report.json", "27-to-28.report.md"],
+  "notes": [
+    "Files are the unmodified workflow artifacts, copied byte for byte.",
+    "An earlier run (run 37380720125, before the ledger-protocol check existed) produced identical numbers.",
+    "Costs are RPC simulateTransaction estimates for tiny example contracts, not on-ledger metered costs.",
+    "The cause of the 5.8% to 8.9% instruction decrease has not been traced."
+  ]
+}
