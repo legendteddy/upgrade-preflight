@@ -65,8 +65,10 @@ describe('toScVal', () => {
       expect(() => toScVal({ type: 'u64', value: '-1' }, DUMMY_ADDRESS)).toThrow(/u64.*negative/);
     });
 
-    it('rejects a value that is not a number', () => {
-      expect(() => toScVal({ type: 'u64', value: 'abc' }, DUMMY_ADDRESS)).toThrow(/Cannot convert abc to a BigInt/);
+    it('rejects a non-decimal value with a readable error', () => {
+      expect(() => toScVal({ type: 'u64', value: 'abc' }, DUMMY_ADDRESS)).toThrow(
+        /Invalid u64 value "abc": expected a decimal integer/,
+      );
     });
   });
 
