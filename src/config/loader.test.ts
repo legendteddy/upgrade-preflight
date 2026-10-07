@@ -14,6 +14,21 @@ const validConfig = {
   ],
 };
 
+const largeIntegerTypes = ['u64', 'i64', 'u128', 'i128'] as const;
+const invalidDecimalIntegers = ['', '  ', '0x10', '0b11', '1.5', 'abc'] as const;
+
+function configWithArg(type: (typeof largeIntegerTypes)[number], value: string) {
+  return {
+    ...validConfig,
+    scenarios: [
+      {
+        ...validConfig.scenarios[0],
+        args: [{ type, value }],
+      },
+    ],
+  };
+}
+
 describe('parseConfig', () => {
   it('accepts a minimal valid config and fills in defaults', () => {
     const config = parseConfig(validConfig);
@@ -57,6 +72,36 @@ describe('parseConfig', () => {
       ],
     };
     expect(() => parseConfig(bad)).toThrow(ConfigError);
+  });
+
+  it.each(
+    largeIntegerTypes.flatMap((type) => invalidDecimalIntegers.map((value) => [type, value] as const)),
+  )('rejects non-decimal %s value %j with a path-aware error', (type, value) => {
+    try {
+      parseConfig(configWithArg(type, value));
+      expect.unreachable();
+    } catch (err) {
+      expect(err).toBeInstanceOf(ConfigError);
+      expect((err as Error).message).toContain('scenarios.0.args.0.value');
+      expect((err as Error).message).toContain(type);
+      expect((err as Error).message).toContain(JSON.stringify(value));
+    }
+  });
+
+  it.each([
+    ['u64', '0'],
+    ['u64', '18446744073709551615'],
+    ['i64', '-1'],
+    ['i64', '-9223372036854775808'],
+    ['i64', '9223372036854775807'],
+    ['u128', '0'],
+    ['u128', '340282366920938463463374607431768211455'],
+    ['i128', '-1'],
+    ['i128', '-170141183460469231731687303715884105728'],
+    ['i128', '170141183460469231731687303715884105727'],
+  ] as const)('accepts decimal %s value %s', (type, value) => {
+    const config = parseConfig(configWithArg(type, value));
+    expect(config.scenarios[0]?.args[0]).toEqual({ type, value });
   });
 
   it('accepts a per-scenario threshold override', () => {
