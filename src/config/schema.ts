@@ -1,12 +1,27 @@
 import { z } from 'zod';
 
+export const DECIMAL_INTEGER_PATTERN = /^-?\d+$/;
+
+type LargeIntegerType = 'u64' | 'i64' | 'u128' | 'i128';
+
+function decimalIntegerString(type: LargeIntegerType) {
+  return z.string().superRefine((value, ctx) => {
+    if (!DECIMAL_INTEGER_PATTERN.test(value)) {
+      ctx.addIssue({
+        code: 'custom',
+        message: `${type} value ${JSON.stringify(value)} must be a decimal integer`,
+      });
+    }
+  });
+}
+
 export const ScVarArgSchema = z.discriminatedUnion('type', [
   z.object({ type: z.literal('u32'), value: z.number().int().nonnegative() }),
   z.object({ type: z.literal('i32'), value: z.number().int() }),
-  z.object({ type: z.literal('u64'), value: z.string() }),
-  z.object({ type: z.literal('i64'), value: z.string() }),
-  z.object({ type: z.literal('u128'), value: z.string() }),
-  z.object({ type: z.literal('i128'), value: z.string() }),
+  z.object({ type: z.literal('u64'), value: decimalIntegerString('u64') }),
+  z.object({ type: z.literal('i64'), value: decimalIntegerString('i64') }),
+  z.object({ type: z.literal('u128'), value: decimalIntegerString('u128') }),
+  z.object({ type: z.literal('i128'), value: decimalIntegerString('i128') }),
   z.object({ type: z.literal('bool'), value: z.boolean() }),
   z.object({ type: z.literal('string'), value: z.string() }),
   z.object({ type: z.literal('symbol'), value: z.string() }),
